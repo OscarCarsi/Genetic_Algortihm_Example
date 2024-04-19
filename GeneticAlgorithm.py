@@ -1,6 +1,7 @@
-#Importamos random y math
+#Importamos random, math y matplotlib para poder hacer operaciones aleatorias, operaciones matemáticas y gráficas respectivamente
 import random;
 import math;
+import matplotlib.pyplot as plt
 
 #Creamos un individuo
 def create_individual():
@@ -45,8 +46,7 @@ def blx_alpha_crossover(parent1, parent2, alpha=0.5):
     return child1, child2 
 
 def replacement_with_elitism(population, parents, children):
-    # Convierte children en una lista 
-    children = list(children)
+    
     # Combina los padres y los hijos
     combined = parents + children
     
@@ -68,11 +68,38 @@ def replacement_with_elitism(population, parents, children):
 
     return population
 
+#Mutación uniforme
+def mutation(individual):
+    #Seleccionamos un número al azar
+    index = random.randint(0, len(individual) - 1)
+    #Cambiamos el valor del número seleccionado por un número al azar entre -5.12 y 5.12
+    individual[index] = round(random.uniform(-5.12, 5.12), 2)
+    return individual
+
 def main():
-    population = create_population(5)
-    parents = selection_by_roulette(population)
-    children = blx_alpha_crossover(parents[0], parents[1])
-    new_population = replacement_with_elitism(population, parents, children)
+    evaluation_limit = 10000 #Establecemos el limite de evaluaciones
+    population_size = 5 #Establecemos el tamaño de la población
+    mutation_probability = 0.9 #Establecemos la probabilidad de mutación
+    population = create_population(population_size) #Creamos la población
+    best_fitnesses = [] #Creamos un array para guardar los mejores valores de aptitud
+    for _ in range(evaluation_limit): #Iteramos hasta llegar al limite de evaluaciones
+        for individual in population: #Iteramos sobre los individuos de la población
+            fitness_value = fitness(individual) #Calculamos la aptitud de cada individuo 
+            print("Individual: ", individual, "Fitness: ", fitness_value) #Imprimimos el individuo y su aptitud
+        best_fitness = min(fitness(individual) for individual in population) #Guardamos el mejor valor de aptitud de cada evaluación
+        best_fitnesses.append(best_fitness)  # Agrega el mejor valor de fitness a la lista
+        parents = selection_by_roulette(population) #Seleccionamos a los padres
+        children = list(blx_alpha_crossover(parents[0], parents[1])) #Cruzamos a los padres
+        for i in range(len(children)): #Por cada hijo
+            if random.random() < mutation_probability: # Lanzamos un random para la mutación
+                children[i] = mutation(children[i]) #Mutamos al hijo
+        population = replacement_with_elitism(population, parents, children) #Reemplazamos a los padres por los hijos
+    # Grafica la convergencia
+    plt.plot(best_fitnesses)
+    plt.title('Convergencia')
+    plt.xlabel('Evaluaciones')
+    plt.ylabel('Valor menor valor de cada evaluación')
+    plt.show()
 
 
 if __name__ == "__main__":
