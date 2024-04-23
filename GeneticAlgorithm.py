@@ -77,14 +77,14 @@ def mutation(individual):
     return individual
 
 def main():
-    evaluation_limit = 10000 #Establecemos el limite de evaluaciones
-    population_size = 5 #Establecemos el tamaño de la población
-    mutation_probability = 0.9 #Establecemos la probabilidad de mutación
+    evaluation_limit = 7000 #Establecemos el limite de evaluaciones
+    population_size = 20 #Establecemos el tamaño de la población
+    mutation_probability = 0.5 #Establecemos la probabilidad de mutación
     population = create_population(population_size) #Creamos la población
     best_fitnesses = [] #Creamos un array para guardar los mejores valores de aptitud
     for _ in range(evaluation_limit): #Iteramos hasta llegar al limite de evaluaciones
         for individual in population: #Iteramos sobre los individuos de la población
-            fitness_value = fitness(individual) #Calculamos la aptitud de cada individuo 
+            fitness_value = fitness(individual) #Calculamos la aptitud de cada individuo
             print("Individual: ", individual, "Fitness: ", fitness_value) #Imprimimos el individuo y su aptitud
         best_fitness = min(fitness(individual) for individual in population) #Guardamos el mejor valor de aptitud de cada evaluación
         best_fitnesses.append(best_fitness)  # Agrega el mejor valor de fitness a la lista
@@ -95,10 +95,15 @@ def main():
                 children[i] = mutation(children[i]) #Mutamos al hijo
         population = replacement_with_elitism(population, parents, children) #Reemplazamos a los padres por los hijos
     # Grafica la convergencia
+    average_best_fitness = sum(best_fitnesses) / len(best_fitnesses)
+    print("Promedio de los mejores valores de aptitud:", average_best_fitness)
+    best_fitness_last = best_fitnesses[-1]
+    print("Mejor valor de aptitud (último):", best_fitness_last)
     plt.plot(best_fitnesses)
     plt.title('Convergencia')
     plt.xlabel('Evaluaciones')
     plt.ylabel('Valor menor valor de cada evaluación')
+    plt.grid(True)  # Agregar cuadrícula al gráfico
     plt.show()
 
 
